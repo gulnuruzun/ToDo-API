@@ -1,7 +1,7 @@
 package org.example.service;
 
 import org.example.model.Todo;
-import org.springframework.stereotype.Service; // <-- Bu importu ekle
+import org.springframework.stereotype.Service; 
 
 import java.util.ArrayList;
 import java.util.List;
