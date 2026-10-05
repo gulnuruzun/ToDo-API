@@ -1,7 +1,7 @@
 package org.example.service;
 
 import org.example.model.Todo;
-import org.springframework.stereotype.Service; // <-- Bu importu ekle
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,9 +11,6 @@ public class TodoService {
 
     private final List<Todo> todoList = new ArrayList<>();
     private int idCounter = 1;
-
-    public TodoService() {
-    }
 
     public Todo addTodo(int userId, String title) {
         Todo todo = new Todo(idCounter++, userId, title, false);
