@@ -1,27 +1,31 @@
 package org.example.controller;
 
+import org.example.repository.UserRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.example.model.User;
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
 
-    private final List<User> userList = new ArrayList<>();
-    private long idCounter = 1;
+    private final UserRepository userRepository;
+    private int idCounter = 1;
+
+    public UserController(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     @PostMapping("/register")
     public ResponseEntity<User> registerUser(@RequestBody User user) {
         user.setId(idCounter++);
-        userList.add(user);
+        userRepository.save(user);
         return ResponseEntity.ok(user);
     }
 
     @GetMapping
     public ResponseEntity<List<User>> getAllUsers() {
-        return ResponseEntity.ok(userList);
+        return ResponseEntity.ok(userRepository.findAll());
     }
 }
