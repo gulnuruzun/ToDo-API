@@ -2,22 +2,22 @@ package org.example.service;
 
 import org.example.model.Todo;
 import org.example.model.User;
+import org.example.repository.TodoRepository;
 import org.example.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 public class TodoService {
 
-    private final List<Todo> todoList = new ArrayList<>();
-    private int idCounter = 1;
     private final UserRepository userRepository;
+    private final TodoRepository todoRepository;
 
-    public TodoService(UserRepository userRepository) {
+    public TodoService(UserRepository userRepository, TodoRepository todoRepository) {
         this.userRepository = userRepository;
+        this.todoRepository = todoRepository;
     }
 
     private User authenticate(String username, String password) {
@@ -39,20 +39,17 @@ public class TodoService {
     public Todo addTodo(String username, String password, String title) {
         User user = authenticate(username, password);
 
-        Todo todo = new Todo(idCounter++, user.getId(), title, false);
-        todoList.add(todo);
-        return todo;
+        Todo todo = new Todo();
+        todo.setUserId(user.getId());
+        todo.setTitle(title);
+        todo.setCompleted(false);
+
+        return todoRepository.save(todo);
     }
 
     public List<Todo> getTodosByUser(String username, String password) {
         User user = authenticate(username, password);
 
-        List<Todo> userTodos = new ArrayList<>();
-        for (Todo todo : todoList) {
-            if (todo.getUserId() == user.getId()) {
-                userTodos.add(todo);
-            }
-        }
-        return userTodos;
+        return todoRepository.findByUserId(user.getId());
     }
 }
