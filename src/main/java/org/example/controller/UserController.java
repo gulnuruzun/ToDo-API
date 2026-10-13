@@ -18,9 +18,13 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<User> registerUser(@RequestBody User user) {
-        User savedUser = userService.registerUser(user);
-        return ResponseEntity.ok(savedUser);
+    public ResponseEntity<?> registerUser(@RequestBody User user) {
+        try {
+            User savedUser = userService.registerUser(user);
+            return ResponseEntity.ok(savedUser);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @GetMapping

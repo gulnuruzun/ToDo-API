@@ -22,6 +22,8 @@ public class UserService {
             throw new RuntimeException("Bu kullanıcı adı zaten alınmış: " + user.getUsername());
         }
 
+        user.setId(0);
+
         return userRepository.save(user);
     }
 
