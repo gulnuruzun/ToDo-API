@@ -1,55 +1,51 @@
 package org.example.service;
 
 import org.example.model.Todo;
-import org.example.model.User;
 import org.example.repository.TodoRepository;
-import org.example.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class TodoService {
 
-    private final UserRepository userRepository;
     private final TodoRepository todoRepository;
 
-    public TodoService(UserRepository userRepository, TodoRepository todoRepository) {
-        this.userRepository = userRepository;
+    public TodoService(TodoRepository todoRepository) {
         this.todoRepository = todoRepository;
     }
 
-    private User authenticate(String username, String password) {
-        Optional<User> userOpt = userRepository.findByUsername(username);
-
-        if (userOpt.isEmpty()) {
-            throw new RuntimeException("Kullanıcı bulunamadı: " + username);
-        }
-
-        User user = userOpt.get();
-
-        if (user.getPassword() == null || !user.getPassword().equals(password)) {
-            throw new RuntimeException("Hatalı şifre!");
-        }
-
-        return user;
+    public List<Todo> getTodosByUserId(String userId) {
+        return todoRepository.findByUserId(userId);
     }
 
-    public Todo addTodo(String username, String password, String title) {
-        User user = authenticate(username, password);
-
-        Todo todo = new Todo();
-        todo.setUserId(user.getId());
-        todo.setTitle(title);
-        todo.setCompleted(false);
-
+    public Todo createTodo(String userId, Todo todo) {
+        todo.setUserId(userId); // Todo'yu doğrudan istek atan kullanıcının UUID'si ile ilişkilendiriyoruz
         return todoRepository.save(todo);
     }
 
-    public List<Todo> getTodosByUser(String username, String password) {
-        User user = authenticate(username, password);
+    public Todo toggleTodoStatus(String userId, int id) {
+        Todo todo = todoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Todo bulunamadı, ID: " + id));
 
-        return todoRepository.findByUserId(user.getId());
+        // Başkasının todiosu üzerinde işlem yapmasını engelliyoruz
+        if (!todo.getUserId().equals(userId)) {
+            throw new RuntimeException("Bu todo üzerinde işlem yapma yetkiniz yok!");
+        }
+
+        todo.setCompleted(!todo.isCompleted());
+        return todoRepository.save(todo);
+    }
+
+    public void deleteTodo(String userId, int id) {
+        Todo todo = todoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Todo bulunamadı, ID: " + id));
+
+
+        if (!todo.getUserId().equals(userId)) {
+            throw new RuntimeException("Bu todo'yu silme yetkiniz yok!");
+        }
+
+        todoRepository.deleteById(id);
     }
 }

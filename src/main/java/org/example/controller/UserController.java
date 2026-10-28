@@ -17,18 +17,19 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@RequestBody User user) {
-        try {
-            User savedUser = userService.registerUser(user);
-            return ResponseEntity.ok(savedUser);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-    }
-
     @GetMapping
     public ResponseEntity<List<User>> getAllUsers() {
         return ResponseEntity.ok(userService.getAllUsers());
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<User> register(@RequestBody User user) {
+        return ResponseEntity.ok(userService.registerUser(user));
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<User> login(@RequestBody User loginRequest) {
+        User user = userService.login(loginRequest.getUsername(), loginRequest.getPassword());
+        return ResponseEntity.ok(user);
     }
 }
