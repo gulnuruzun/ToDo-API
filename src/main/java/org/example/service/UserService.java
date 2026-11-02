@@ -13,10 +13,12 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final SessionService sessionService;
 
-    public UserService(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder, SessionService sessionService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.sessionService = sessionService;
     }
 
     public List<User> getAllUsers() {
@@ -29,12 +31,12 @@ public class UserService {
     }
 
 
-    public User login(String username, String password) {
+    public String login(String username, String password) {
         Optional<User> userOpt = userRepository.findByUsername(username);
         if (userOpt.isPresent()) {
             User user = userOpt.get();
             if (passwordEncoder.matches(password, user.getPassword())) {
-                return user;
+                return sessionService.createSession(user.getId());
             }
         }
         throw new RuntimeException("Geçersiz kullanıcı adı veya şifre!");

@@ -8,24 +8,22 @@ import java.util.UUID;
 public class User {
 
     @Id
-    private String id;
+    @GeneratedValue
+    private UUID id;
 
     @Column(unique = true)
     private String username;
     private String password;
 
-    public User() {
-        this.id = UUID.randomUUID().toString();
-    }
+    public User() {}
 
     public User(String username, String password) {
-        this.id = UUID.randomUUID().toString();
         this.username = username;
         this.password = password;
     }
 
-    public String getId() { return id; }
-    public void setId(String id) { this.id = id; }
+    public UUID getId() { return id; }
+    public void setId(UUID id) { this.id = id; }
 
     public String getUsername() { return username; }
     public void setUsername(String username) { this.username = username; }

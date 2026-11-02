@@ -5,6 +5,7 @@ import org.example.repository.TodoRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class TodoService {
@@ -15,20 +16,19 @@ public class TodoService {
         this.todoRepository = todoRepository;
     }
 
-    public List<Todo> getTodosByUserId(String userId) {
+    public List<Todo> getTodosByUserId(UUID userId) {
         return todoRepository.findByUserId(userId);
     }
 
-    public Todo createTodo(String userId, Todo todo) {
-        todo.setUserId(userId); // Todo'yu doğrudan istek atan kullanıcının UUID'si ile ilişkilendiriyoruz
+    public Todo createTodo(UUID userId, Todo todo) {
+        todo.setUserId(userId);
         return todoRepository.save(todo);
     }
 
-    public Todo toggleTodoStatus(String userId, int id) {
+    public Todo toggleTodoStatus(UUID userId, int id) {
         Todo todo = todoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Todo bulunamadı, ID: " + id));
 
-        // Başkasının todiosu üzerinde işlem yapmasını engelliyoruz
         if (!todo.getUserId().equals(userId)) {
             throw new RuntimeException("Bu todo üzerinde işlem yapma yetkiniz yok!");
         }
@@ -37,10 +37,9 @@ public class TodoService {
         return todoRepository.save(todo);
     }
 
-    public void deleteTodo(String userId, int id) {
+    public void deleteTodo(UUID userId, int id) {
         Todo todo = todoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Todo bulunamadı, ID: " + id));
-
 
         if (!todo.getUserId().equals(userId)) {
             throw new RuntimeException("Bu todo'yu silme yetkiniz yok!");
